@@ -205,7 +205,6 @@
       <textarea id="instagram-textarea" placeholder="Paste each version on its own line..."></textarea>
       <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
       <button class="save-btn" id="instagram-save-btn">Save variants</button>
-      <button class="save-btn" id="instagram-reset-btn" style="margin-top:8px;">Load latest defaults</button>
     </div>
   </div>
 
@@ -219,7 +218,6 @@
       <textarea id="youtube-textarea" placeholder="Paste each version on its own line..."></textarea>
       <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
       <button class="save-btn" id="youtube-save-btn">Save variants</button>
-      <button class="save-btn" id="youtube-reset-btn" style="margin-top:8px;">Load latest defaults</button>
     </div>
   </div>
 
@@ -233,7 +231,6 @@
       <textarea id="comment-textarea" placeholder="Paste each version on its own line. Use {domain} where your domain should go."></textarea>
       <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
       <button class="save-btn" id="comment-save-btn">Save variants</button>
-      <button class="save-btn" id="comment-reset-btn" style="margin-top:8px;">Load latest defaults</button>
     </div>
   </div>
 </main>
@@ -480,16 +477,6 @@
       await persist();
       render(type);
       showToast('Variants saved');
-    });
-
-    document.getElementById(type + '-reset-btn').addEventListener('click', async () => {
-      const defaults = DEFAULTS[type].slice();
-      state[type].variants = defaults;
-      state[type].order = shuffle(defaults.map((_, i) => i));
-      state[type].pos = 0;
-      await persist();
-      render(type);
-      showToast('Defaults loaded');
     });
   }
 
