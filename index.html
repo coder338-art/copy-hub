@@ -196,28 +196,15 @@
 
 <main>
   <div class="card">
-    <h2>Instagram caption</h2>
-    <div class="current-text" id="instagram-preview">No variants yet — add some below.</div>
-    <button class="copy-btn" id="instagram-copy-btn">Copy caption</button>
-    <div class="status-line" id="instagram-status"></div>
-    <button class="edit-toggle" id="instagram-edit-toggle">Edit variants</button>
-    <div class="editor" id="instagram-editor">
-      <textarea id="instagram-textarea" placeholder="Paste each version on its own line..."></textarea>
+    <h2>Caption</h2>
+    <div class="current-text" id="caption-preview">No variants yet — add some below.</div>
+    <button class="copy-btn" id="caption-copy-btn">Copy caption</button>
+    <div class="status-line" id="caption-status"></div>
+    <button class="edit-toggle" id="caption-edit-toggle">Edit variants</button>
+    <div class="editor" id="caption-editor">
+      <textarea id="caption-textarea" placeholder="Paste each version on its own line..."></textarea>
       <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
-      <button class="save-btn" id="instagram-save-btn">Save variants</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>YouTube caption</h2>
-    <div class="current-text" id="youtube-preview">No variants yet — add some below.</div>
-    <button class="copy-btn" id="youtube-copy-btn">Copy caption</button>
-    <div class="status-line" id="youtube-status"></div>
-    <button class="edit-toggle" id="youtube-edit-toggle">Edit variants</button>
-    <div class="editor" id="youtube-editor">
-      <textarea id="youtube-textarea" placeholder="Paste each version on its own line..."></textarea>
-      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
-      <button class="save-btn" id="youtube-save-btn">Save variants</button>
+      <button class="save-btn" id="caption-save-btn">Save variants</button>
     </div>
   </div>
 
@@ -239,7 +226,7 @@
 
 <script>
   const DEFAULTS = {
-    instagram: [
+    caption: [
       "How is pinned in the comments",
       "Tutorial\u2019s pinned in comment \ud83d\udc49",
       "How\u2019s pinned in comments \ud83d\udc49",
@@ -277,9 +264,7 @@
       "Tutorial pinned below \ud83d\udc47",
       "How's pinned up top in comments",
       "How to get it pinned in comment section \ud83d\udc49",
-      "See pinned comment for how \ud83d\udccc"
-    ],
-    youtube: [
+      "See pinned comment for how \ud83d\udccc",
       "TUTORIAL IN DESCRIPTION \ud83d\udc47",
       "tut in descriptionn \ud83d\udc47",
       "I love it!! (Read how\ud83d\udc47)",
@@ -332,8 +317,7 @@
 
   let state = {
     domain: '',
-    instagram: { variants: [], order: [], pos: 0 },
-    youtube: { variants: [], order: [], pos: 0 },
+    caption: { variants: [], order: [], pos: 0 },
     comment: { variants: [], order: [], pos: 0 }
   };
 
@@ -353,8 +337,7 @@
       if (res && res.value) {
         const parsed = JSON.parse(res.value);
         state.domain = parsed.domain || '';
-        if (parsed.instagram) state.instagram = parsed.instagram;
-        if (parsed.youtube) state.youtube = parsed.youtube;
+        if (parsed.caption) state.caption = parsed.caption;
         if (parsed.comment) state.comment = parsed.comment;
         loaded = true;
       }
@@ -364,18 +347,15 @@
 
     if (!loaded) {
       // first run: seed with provided defaults
-      state.instagram.variants = DEFAULTS.instagram.slice();
-      state.youtube.variants = DEFAULTS.youtube.slice();
+      state.caption.variants = DEFAULTS.caption.slice();
       state.comment.variants = DEFAULTS.comment.slice();
-      state.instagram.order = shuffle(state.instagram.variants.map((_, i) => i));
-      state.youtube.order = shuffle(state.youtube.variants.map((_, i) => i));
+      state.caption.order = shuffle(state.caption.variants.map((_, i) => i));
       state.comment.order = shuffle(state.comment.variants.map((_, i) => i));
       await persist();
     }
 
     document.getElementById('domain-input').value = state.domain;
-    render('instagram');
-    render('youtube');
+    render('caption');
     render('comment');
   }
 
@@ -486,8 +466,7 @@
     render('comment');
   });
 
-  setupType('instagram');
-  setupType('youtube');
+  setupType('caption');
   setupType('comment');
   loadState();
 </script>
