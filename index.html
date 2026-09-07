@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Copy Hub</title>
+<style>
+  :root {
+    --ink: #eae7e0;
+    --dim: #9a9488;
+    --bg: #141412;
+    --panel: #1d1c19;
+    --line: #322f2a;
+    --accent: #5fae94;
+    --accent-strong: #3f8a71;
+    --field-bg: #100f0d;
+  }
+  * { box-sizing: border-box; touch-action: manipulation; }
+  html { touch-action: manipulation; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+  header {
+    padding: 20px 18px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 {
+    margin: 0;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+  }
+
+  .domain-card {
+    margin: 16px 18px 0;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .domain-card label {
+    display: block;
+    font-size: 12px;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+  .domain-card input {
+    width: 100%;
+    background: var(--field-bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 15px;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .domain-card input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .domain-hint {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 6px;
+  }
+
+  main {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .card h2 {
+    font-size: 13px;
+    margin: 0 0 10px;
+    color: var(--dim);
+    font-weight: 600;
+  }
+  .current-text {
+    font-size: 15px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    min-height: 56px;
+    padding: 10px 12px;
+    background: var(--field-bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+  }
+  .copy-btn {
+    width: 100%;
+    padding: 14px 0;
+    background: var(--accent-strong);
+    color: #0c1512;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 10px;
+  }
+  .copy-btn:active { background: var(--accent); }
+
+  .status-line {
+    font-size: 12px;
+    color: var(--dim);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .edit-toggle {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--accent);
+    text-align: center;
+    background: transparent;
+    width: 100%;
+    padding: 6px 0;
+  }
+
+  .editor {
+    display: none;
+    margin-top: 10px;
+  }
+  .editor.open { display: block; }
+  textarea {
+    width: 100%;
+    min-height: 130px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    background: var(--field-bg);
+    color: var(--ink);
+  }
+  .hint {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 6px;
+  }
+  .save-btn {
+    margin-top: 10px;
+    padding: 11px 0;
+    width: 100%;
+    background: var(--line);
+    color: var(--ink);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-strong);
+    color: #0c1512;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Copy Hub</h1>
+</header>
+
+<div class="domain-card">
+  <label for="domain-input">Your domain</label>
+  <input id="domain-input" type="text" placeholder="yoursite.com" autocomplete="off" autocapitalize="off" autocorrect="off">
+  <div class="domain-hint">Use {domain} in your pinned comment variants to auto-insert this.</div>
+</div>
+
+<main>
+  <div class="card">
+    <h2>Instagram caption</h2>
+    <div class="current-text" id="instagram-preview">No variants yet — add some below.</div>
+    <button class="copy-btn" id="instagram-copy-btn">Copy caption</button>
+    <div class="status-line" id="instagram-status"></div>
+    <button class="edit-toggle" id="instagram-edit-toggle">Edit variants</button>
+    <div class="editor" id="instagram-editor">
+      <textarea id="instagram-textarea" placeholder="Paste each version on its own line..."></textarea>
+      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
+      <button class="save-btn" id="instagram-save-btn">Save variants</button>
+      <button class="save-btn" id="instagram-reset-btn" style="margin-top:8px;">Load latest defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>YouTube caption</h2>
+    <div class="current-text" id="youtube-preview">No variants yet — add some below.</div>
+    <button class="copy-btn" id="youtube-copy-btn">Copy caption</button>
+    <div class="status-line" id="youtube-status"></div>
+    <button class="edit-toggle" id="youtube-edit-toggle">Edit variants</button>
+    <div class="editor" id="youtube-editor">
+      <textarea id="youtube-textarea" placeholder="Paste each version on its own line..."></textarea>
+      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
+      <button class="save-btn" id="youtube-save-btn">Save variants</button>
+      <button class="save-btn" id="youtube-reset-btn" style="margin-top:8px;">Load latest defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Pinned comment</h2>
+    <div class="current-text" id="comment-preview">No variants yet — add some below.</div>
+    <button class="copy-btn" id="comment-copy-btn">Copy comment</button>
+    <div class="status-line" id="comment-status"></div>
+    <button class="edit-toggle" id="comment-edit-toggle">Edit variants</button>
+    <div class="editor" id="comment-editor">
+      <textarea id="comment-textarea" placeholder="Paste each version on its own line. Use {domain} where your domain should go."></textarea>
+      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
+      <button class="save-btn" id="comment-save-btn">Save variants</button>
+      <button class="save-btn" id="comment-reset-btn" style="margin-top:8px;">Load latest defaults</button>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+  const DEFAULTS = {
+    instagram: [
+      "How is pinned in the comments",
+      "Tutorial\u2019s pinned in comment \ud83d\udc49",
+      "How\u2019s pinned in comments \ud83d\udc49",
+      "How is pinned in comments \ud83d\udc49",
+      "How\u2019s pinned in comments",
+      "How is pinned in comments \ud83d\udccc",
+      "How to get it is pinned in comments",
+      "How is pinned in the comments section",
+      "How is sitting in comments",
+      "How is in comments",
+      "Tutorial pinned in comments \ud83d\udc49",
+      "Tutorial pinned in comments \ud83d\udc95",
+      "How is in comments \ud83d\udc49",
+      "How in comments \ud83d\udc49",
+      "How is pinned in comments",
+      "Checkout pinned comment for tutorial \ud83d\udc49",
+      "How in pinned comment \ud83d\udc49",
+      "How is pinned in the comments \ud83d\udccc",
+      "How to get coupon steps are in comments \ud83d\udc46",
+      "How is pinned in comments \ud83d\ude2d",
+      "How in comments \ud83d\udc49",
+      "How to get coupon code is pinned in comments \ud83d\udc46",
+      "How is in comments \ud83d\udc46",
+      "How's pinned in the comments \ud83d\udc47",
+      "Tutorial is pinned in the comments",
+      "How to do it is pinned in comments \ud83d\udc49",
+      "How's in the comments section",
+      "Tutorial's in comments \ud83d\udc49",
+      "How is up in comments \ud83d\udccc",
+      "Check the pinned comment for how \ud83d\udc49",
+      "How to is pinned below \ud83d\udc47",
+      "Full how-to pinned in comments",
+      "Steps are pinned in comments \ud83d\udc46",
+      "How's stickied in comments",
+      "Tutorial pinned below \ud83d\udc47",
+      "How's pinned up top in comments",
+      "How to get it pinned in comment section \ud83d\udc49",
+      "See pinned comment for how \ud83d\udccc"
+    ],
+    youtube: [
+      "TUTORIAL IN DESCRIPTION \ud83d\udc47",
+      "tut in descriptionn \ud83d\udc47",
+      "I love it!! (Read how\ud83d\udc47)",
+      "How in description \ud83d\ude2b",
+      "Read how...\ud83d\udc47",
+      "FULL TUTORIAL IN DESC \ud83d\udc47",
+      "how in descriptionnn \ud83d\udc47",
+      "Obsessed with this!! (how below\ud83d\udc47)",
+      "steps in description \ud83d\ude29",
+      "link + how below...\ud83d\udc47",
+      "See description for how \ud83d\udc47",
+      "tutorial's in the desc \ud83d\udc47",
+      "Tutorial's in the description \ud83d\udc47",
+      "how-to is below \ud83d\udc47",
+      "Loved making this!! (full how below\ud83d\udc47)",
+      "steps are in the desc \ud83d\ude05",
+      "full guide linked below \ud83d\udc47",
+      "check description for the how \ud83d\udc47",
+      "how to do this is below \ud83d\udc47",
+      "desc has the full tutorial \ud83d\udc47",
+      "read the description for how \ud83d\udc47",
+      "tut linked in desc \ud83d\udc47",
+      "steps + link in description \ud83d\udc47",
+      "how in the desc below \ud83d\udc47",
+      "full walkthrough in desc \ud83d\udc47"
+    ],
+    comment: [
+      "Here's how I did it:\n\u2022 Go to: {domain} on your phone.\n\u2022 Read the instructions carefully.\n\u2022 Complete the steps on the page.\n\u2022 Claim your discount coupon.",
+      "Here's exactly how:\n\u2022 Open {domain} on your phone.\n\u2022 Follow the instructions closely.\n\u2022 Finish the steps shown.\n\u2022 Grab your discount coupon.",
+      "This is how I got it:\n\u2022 Head to {domain} on your phone.\n\u2022 Read through the steps carefully.\n\u2022 Complete everything on the page.\n\u2022 Claim your coupon.",
+      "How I did it, step by step:\n\u2022 Visit {domain} on your phone.\n\u2022 Read each instruction closely.\n\u2022 Complete the steps listed.\n\u2022 Redeem your discount coupon.",
+      "Here's the process:\n\u2022 Go to {domain} using your phone.\n\u2022 Carefully read the instructions.\n\u2022 Finish the steps on the page.\n\u2022 Claim your coupon code.",
+      "Quick rundown of how I did it:\n\u2022 Go to {domain} on your phone.\n\u2022 Read the instructions carefully.\n\u2022 Work through each step on the page.\n\u2022 Claim your coupon.",
+      "Here's how it works:\n\u2022 Pull up {domain} on your phone.\n\u2022 Read the steps closely.\n\u2022 Complete what's on the page.\n\u2022 Grab your discount.",
+      "The steps I followed:\n\u2022 Go to {domain} on your phone.\n\u2022 Read through everything carefully.\n\u2022 Finish the page's steps.\n\u2022 Claim your discount code.",
+      "Here's how to get it:\n\u2022 Open {domain} from your phone.\n\u2022 Read each step carefully.\n\u2022 Complete the page fully.\n\u2022 Redeem your coupon.",
+      "For anyone asking, here's how:\n\u2022 Go to {domain} on your phone.\n\u2022 Carefully follow the instructions.\n\u2022 Complete all the steps.\n\u2022 Claim the coupon.",
+      "Sharing exactly how I did this:\n\u2022 Visit {domain} on your phone.\n\u2022 Read the instructions fully.\n\u2022 Complete each step shown.\n\u2022 Get your discount coupon.",
+      "Steps to get yours:\n\u2022 Go to {domain} on your phone.\n\u2022 Read carefully before starting.\n\u2022 Finish the steps on the page.\n\u2022 Claim your coupon.",
+      "Here's the full process:\n\u2022 Head over to {domain} on your phone.\n\u2022 Read through the instructions.\n\u2022 Complete the steps in order.\n\u2022 Claim your discount.",
+      "This is the exact method:\n\u2022 Go to {domain} using your phone.\n\u2022 Read each instruction carefully.\n\u2022 Complete the page's steps.\n\u2022 Redeem the coupon.",
+      "Here's what to do:\n\u2022 Open {domain} on your phone.\n\u2022 Read everything carefully first.\n\u2022 Complete the steps as shown.\n\u2022 Claim your coupon code.",
+      "How to claim yours:\n\u2022 Go to {domain} on your phone.\n\u2022 Read the full instructions.\n\u2022 Complete each step on the page.\n\u2022 Grab your coupon.",
+      "The process, step by step:\n\u2022 Visit {domain} from your phone.\n\u2022 Read the instructions thoroughly.\n\u2022 Complete the page's steps.\n\u2022 Claim your discount coupon.",
+      "Here's how I got mine:\n\u2022 Go to {domain} on your phone.\n\u2022 Read through it carefully.\n\u2022 Finish all the steps.\n\u2022 Claim the coupon.",
+      "Full breakdown of the steps:\n\u2022 Open {domain} on your phone.\n\u2022 Read the instructions in full.\n\u2022 Complete everything listed.\n\u2022 Redeem your discount.",
+      "Here's how this works:\n\u2022 Head to {domain} on your phone.\n\u2022 Read the steps carefully.\n\u2022 Complete the page.\n\u2022 Claim your coupon code."
+    ]
+  };
+
+  let state = {
+    domain: '',
+    instagram: { variants: [], order: [], pos: 0 },
+    youtube: { variants: [], order: [], pos: 0 },
+    comment: { variants: [], order: [], pos: 0 }
+  };
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  async function loadState() {
+    let loaded = false;
+    try {
+      const res = await window.storage.get('state', false);
+      if (res && res.value) {
+        const parsed = JSON.parse(res.value);
+        state.domain = parsed.domain || '';
+        if (parsed.instagram) state.instagram = parsed.instagram;
+        if (parsed.youtube) state.youtube = parsed.youtube;
+        if (parsed.comment) state.comment = parsed.comment;
+        loaded = true;
+      }
+    } catch (e) {
+      // no saved state yet
+    }
+
+    if (!loaded) {
+      // first run: seed with provided defaults
+      state.instagram.variants = DEFAULTS.instagram.slice();
+      state.youtube.variants = DEFAULTS.youtube.slice();
+      state.comment.variants = DEFAULTS.comment.slice();
+      state.instagram.order = shuffle(state.instagram.variants.map((_, i) => i));
+      state.youtube.order = shuffle(state.youtube.variants.map((_, i) => i));
+      state.comment.order = shuffle(state.comment.variants.map((_, i) => i));
+      await persist();
+    }
+
+    document.getElementById('domain-input').value = state.domain;
+    render('instagram');
+    render('youtube');
+    render('comment');
+  }
+
+  async function persist() {
+    try {
+      await window.storage.set('state', JSON.stringify(state), false);
+    } catch (e) {
+      console.error('save failed', e);
+    }
+  }
+
+  function ensureOrder(type) {
+    const s = state[type];
+    if (!s.order || s.order.length !== s.variants.length || s.pos >= s.order.length) {
+      s.order = shuffle(s.variants.map((_, i) => i));
+      s.pos = 0;
+    }
+  }
+
+  function displayText(type, raw) {
+    if (type === 'comment') {
+      return raw.split('{domain}').join(state.domain || '{domain}');
+    }
+    return raw;
+  }
+
+  function render(type) {
+    const s = state[type];
+    const preview = document.getElementById(type + '-preview');
+    const status = document.getElementById(type + '-status');
+    const textarea = document.getElementById(type + '-textarea');
+
+    if (document.activeElement !== textarea) {
+      textarea.value = s.variants.join('\n');
+    }
+
+    if (s.variants.length === 0) {
+      preview.textContent = 'No variants yet — add some below.';
+      status.textContent = '';
+      return;
+    }
+
+    ensureOrder(type);
+    const nextIdx = s.order[s.pos];
+    preview.textContent = displayText(type, s.variants[nextIdx]);
+    status.textContent = `${s.pos + 1} of ${s.variants.length} in this rotation`;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1400);
+  }
+
+  async function copyCurrent(type) {
+    const s = state[type];
+    if (s.variants.length === 0) {
+      showToast('Add some variants first');
+      return;
+    }
+    ensureOrder(type);
+    const idx = s.order[s.pos];
+    const text = displayText(type, s.variants[idx]);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    s.pos += 1;
+    if (s.pos >= s.order.length) {
+      s.order = shuffle(s.variants.map((_, i) => i));
+      s.pos = 0;
+    }
+    await persist();
+    render(type);
+    showToast('Copied — next one queued');
+  }
+
+  function setupType(type) {
+    document.getElementById(type + '-copy-btn').addEventListener('click', () => copyCurrent(type));
+
+    document.getElementById(type + '-edit-toggle').addEventListener('click', () => {
+      const ed = document.getElementById(type + '-editor');
+      ed.classList.toggle('open');
+    });
+
+    document.getElementById(type + '-save-btn').addEventListener('click', async () => {
+      const textarea = document.getElementById(type + '-textarea');
+      const lines = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      state[type].variants = lines;
+      state[type].order = shuffle(lines.map((_, i) => i));
+      state[type].pos = 0;
+      await persist();
+      render(type);
+      showToast('Variants saved');
+    });
+
+    document.getElementById(type + '-reset-btn').addEventListener('click', async () => {
+      const defaults = DEFAULTS[type].slice();
+      state[type].variants = defaults;
+      state[type].order = shuffle(defaults.map((_, i) => i));
+      state[type].pos = 0;
+      await persist();
+      render(type);
+      showToast('Defaults loaded');
+    });
+  }
+
+  document.getElementById('domain-input').addEventListener('input', async (e) => {
+    state.domain = e.target.value;
+    await persist();
+    render('comment');
+  });
+
+  setupType('instagram');
+  setupType('youtube');
+  setupType('comment');
+  loadState();
+</script>
+
+</body>
+</html>
