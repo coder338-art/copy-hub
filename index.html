@@ -346,42 +346,37 @@
   }
 
   async function loadState() {
-    // Show defaults immediately so the UI is never blank, regardless of storage.
+    // Show defaults immediately so the UI is never blank.
     state.videocaption.variants = DEFAULTS.videocaption.slice();
     state.videocaption.order = shuffle(state.videocaption.variants.map((_, i) => i));
     state.caption.variants = DEFAULTS.caption.slice();
     state.caption.order = shuffle(state.caption.variants.map((_, i) => i));
     state.comment.variants = DEFAULTS.comment.slice();
     state.comment.order = shuffle(state.comment.variants.map((_, i) => i));
-    document.getElementById('domain-input').value = state.domain;
-    render('videocaption');
-    render('caption');
-    render('comment');
 
-    // Then try to load any previously saved data and overwrite if present.
+    // Then load any previously saved data from localStorage and overwrite if present.
     try {
-      const res = await window.storage.get('state', false);
-      if (res && res.value) {
-        const parsed = JSON.parse(res.value);
+      const raw = localStorage.getItem('copyhub-state');
+      if (raw) {
+        const parsed = JSON.parse(raw);
         state.domain = parsed.domain || '';
         if (parsed.videocaption && parsed.videocaption.variants && parsed.videocaption.variants.length) state.videocaption = parsed.videocaption;
         if (parsed.caption && parsed.caption.variants && parsed.caption.variants.length) state.caption = parsed.caption;
         if (parsed.comment && parsed.comment.variants && parsed.comment.variants.length) state.comment = parsed.comment;
-        document.getElementById('domain-input').value = state.domain;
-        render('videocaption');
-        render('caption');
-        render('comment');
-      } else {
-        await persist();
       }
     } catch (e) {
-      // storage unavailable — defaults already shown, nothing more to do
+      // storage unavailable — defaults already set in memory
     }
+
+    document.getElementById('domain-input').value = state.domain;
+    render('videocaption');
+    render('caption');
+    render('comment');
   }
 
-  async function persist() {
+  function persist() {
     try {
-      await window.storage.set('state', JSON.stringify(state), false);
+      localStorage.setItem('copyhub-state', JSON.stringify(state));
     } catch (e) {
       console.error('save failed', e);
     }
@@ -455,7 +450,7 @@
       s.order = shuffle(s.variants.map((_, i) => i));
       s.pos = 0;
     }
-    await persist();
+    persist();
     render(type);
     showToast('Copied — next one queued');
   }
@@ -474,7 +469,7 @@
       state[type].variants = lines;
       state[type].order = shuffle(lines.map((_, i) => i));
       state[type].pos = 0;
-      await persist();
+      persist();
       render(type);
       showToast('Variants saved');
     });
@@ -482,7 +477,7 @@
 
   document.getElementById('domain-input').addEventListener('input', async (e) => {
     state.domain = e.target.value;
-    await persist();
+    persist();
     render('comment');
   });
 
