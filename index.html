@@ -196,9 +196,22 @@
 
 <main>
   <div class="card">
-    <h2>CTA</h2>
+    <h2>Caption</h2>
+    <div class="current-text" id="videocaption-preview">No variants yet — add some below.</div>
+    <button class="copy-btn" id="videocaption-copy-btn">Copy caption</button>
+    <div class="status-line" id="videocaption-status"></div>
+    <button class="edit-toggle" id="videocaption-edit-toggle">Edit variants</button>
+    <div class="editor" id="videocaption-editor">
+      <textarea id="videocaption-textarea" placeholder="Paste each caption version on its own line, e.g. Why didn't anyone tell me this?😭"></textarea>
+      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
+      <button class="save-btn" id="videocaption-save-btn">Save variants</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>On-screen CTA</h2>
     <div class="current-text" id="caption-preview">No variants yet — add some below.</div>
-    <button class="copy-btn" id="caption-copy-btn">Copy CTA</button>
+    <button class="copy-btn" id="caption-copy-btn">Copy on-screen CTA</button>
     <div class="status-line" id="caption-status"></div>
     <button class="edit-toggle" id="caption-edit-toggle">Edit variants</button>
     <div class="editor" id="caption-editor">
@@ -225,7 +238,33 @@
 <div class="toast" id="toast">Copied</div>
 
 <script>
-  const DEFAULTS = {
+    videocaption: [
+      "Why didn't anyone tell me this?\ud83d\ude2d",
+      "Wait... this actually works?!\ud83d\ude33",
+      "I wish I knew this sooner \ud83d\ude29",
+      "Nobody talks about this enough?!\ud83d\ude24",
+      "This changed everything for me \ud83d\ude0d",
+      "How is this not more popular?\ud83e\udd14",
+      "I can't believe this was free?!\ud83d\ude31",
+      "This should be illegal it's that good \ud83d\ude29\ud83d\udd25",
+      "Save this before it's too late \u26a0\ufe0f",
+      "This is your sign to try it \u2728",
+      "Why is no one talking about this?\ud83d\ude33",
+      "I tried it so you don't have to \ud83d\ude05",
+      "This took me way too long to find \ud83d\ude29",
+      "Okay this is actually genius?!\ud83e\udde0",
+      "Wish someone showed me this years ago \ud83d\ude2d",
+      "This is not a drill \ud83d\udea8",
+      "You need to see this \ud83d\udc40",
+      "This is criminally underrated?!\ud83d\ude24",
+      "I'm still thinking about this \ud83e\udd2f",
+      "This one's a game changer \ud83d\ude4c",
+      "Everyone needs to know this \u2757",
+      "This felt illegal to know \ud83d\ude33",
+      "I was today years old when I learned this \ud83d\ude33",
+      "This is the trick nobody shares?!\ud83e\udd10",
+      "Bookmark this for later \ud83d\udccc"
+    ],
     caption: [
       "How is pinned in the comments",
       "Tutorial\u2019s pinned in comment \ud83d\udc49",
@@ -292,6 +331,7 @@
 
   let state = {
     domain: '',
+    videocaption: { variants: [], order: [], pos: 0 },
     caption: { variants: [], order: [], pos: 0 },
     comment: { variants: [], order: [], pos: 0 }
   };
@@ -312,6 +352,7 @@
       if (res && res.value) {
         const parsed = JSON.parse(res.value);
         state.domain = parsed.domain || '';
+        if (parsed.videocaption) state.videocaption = parsed.videocaption;
         if (parsed.caption) state.caption = parsed.caption;
         if (parsed.comment) state.comment = parsed.comment;
         loaded = true;
@@ -330,6 +371,7 @@
     }
 
     document.getElementById('domain-input').value = state.domain;
+    render('videocaption');
     render('caption');
     render('comment');
   }
@@ -441,6 +483,7 @@
     render('comment');
   });
 
+  setupType('videocaption');
   setupType('caption');
   setupType('comment');
   loadState();
