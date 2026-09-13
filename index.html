@@ -361,14 +361,22 @@
       // no saved state yet
     }
 
-    if (!loaded) {
-      // first run: seed with provided defaults
-      state.caption.variants = DEFAULTS.caption.slice();
-      state.comment.variants = DEFAULTS.comment.slice();
-      state.caption.order = shuffle(state.caption.variants.map((_, i) => i));
-      state.comment.order = shuffle(state.comment.variants.map((_, i) => i));
-      await persist();
+    if (state.videocaption.variants.length === 0) {
+      state.videocaption.variants = DEFAULTS.videocaption.slice();
+      state.videocaption.order = shuffle(state.videocaption.variants.map((_, i) => i));
+      state.videocaption.pos = 0;
     }
+    if (state.caption.variants.length === 0) {
+      state.caption.variants = DEFAULTS.caption.slice();
+      state.caption.order = shuffle(state.caption.variants.map((_, i) => i));
+      state.caption.pos = 0;
+    }
+    if (state.comment.variants.length === 0) {
+      state.comment.variants = DEFAULTS.comment.slice();
+      state.comment.order = shuffle(state.comment.variants.map((_, i) => i));
+      state.comment.pos = 0;
+    }
+    await persist();
 
     document.getElementById('domain-input').value = state.domain;
     render('videocaption');
