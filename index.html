@@ -2,243 +2,692 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Copy Hub</title>
 <style>
   :root {
-    --ink: #eae7e0;
-    --dim: #9a9488;
-    --bg: #141412;
-    --panel: #1d1c19;
-    --line: #322f2a;
-    --accent: #5fae94;
-    --accent-strong: #3f8a71;
-    --field-bg: #100f0d;
-  }
-  * { box-sizing: border-box; touch-action: manipulation; }
-  html { touch-action: manipulation; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-    padding-bottom: 40px;
-  }
-  header {
-    padding: 20px 18px 14px;
-    border-bottom: 1px solid var(--line);
-  }
-  header h1 {
-    margin: 0;
-    font-size: 19px;
-    letter-spacing: -0.01em;
+    --bg: #131417;
+    --surface: #1C1E22;
+    --surface-raised: #232529;
+    --border: rgba(255,255,255,0.09);
+    --text: #EDEBE6;
+    --text-soft: #8B8D93;
+    --accent: #D9A441;
+    --accent-dark: #B8863A;
+    --accent-text: #171208;
   }
 
-  .domain-card {
-    margin: 16px 18px 0;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 12px 14px;
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
-  .domain-card label {
-    display: block;
-    font-size: 12px;
-    color: var(--dim);
-    margin-bottom: 6px;
+
+  body {
+    margin: 0;
+    color-scheme: dark;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
   }
-  .domain-card input {
+
+  .app {
     width: 100%;
-    background: var(--field-bg);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 15px;
-    color: var(--ink);
-    font-family: inherit;
+    max-width: 480px;
+    padding: 20px 16px 40px;
   }
-  .domain-card input:focus {
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  header h1 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  header .count {
+    font-family: "SF Mono", "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+
+  .vars-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 22px;
+  }
+
+  .vars-title {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-bottom: 10px;
+  }
+
+  .vars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .var-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .var-field.full { grid-column: 1 / -1; }
+
+  .var-field label {
+    font-size: 10.5px;
+    color: var(--text-soft);
+  }
+
+  .var-field input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 9px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .var-field input:focus {
     outline: none;
     border-color: var(--accent);
   }
-  .domain-hint {
-    font-size: 11px;
-    color: var(--dim);
-    margin-top: 6px;
-  }
 
-  main {
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 16px;
-  }
-  .card h2 {
-    font-size: 13px;
-    margin: 0 0 10px;
-    color: var(--dim);
-    font-weight: 600;
-  }
-  .current-text {
-    font-size: 15px;
+  .vars-hint {
+    font-size: 10.5px;
+    color: var(--text-soft);
+    margin-top: 9px;
     line-height: 1.5;
-    white-space: pre-wrap;
-    min-height: 56px;
+  }
+  .vars-hint code {
+    background: var(--bg);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: "SF Mono", "IBM Plex Mono", monospace;
+    color: var(--accent);
+  }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+
+  .core-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     padding: 10px 12px;
-    background: var(--field-bg);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    margin-bottom: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text);
+    resize: vertical;
+    min-height: 50px;
   }
-  button {
-    font-family: inherit;
+  .core-input::placeholder { color: var(--text-soft); }
+  .core-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .save-hint {
+    font-size: 11px;
+    color: var(--text-soft);
+    margin-top: 4px;
+    min-height: 14px;
+  }
+
+  .display {
+    margin: 10px 0 10px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 14px;
+    font-family: "SF Mono", "IBM Plex Mono", monospace;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 44px;
     cursor: pointer;
-    border: none;
   }
+  .display.empty { color: var(--text-soft); font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+
+  .display.entering {
+    animation: fade-in 260ms ease;
+  }
+  @keyframes fade-in {
+    0% { opacity: 0; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
   .copy-btn {
     width: 100%;
-    padding: 14px 0;
-    background: var(--accent-strong);
-    color: #0c1512;
-    font-size: 15px;
-    font-weight: 700;
-    border-radius: 10px;
-  }
-  .copy-btn:active { background: var(--accent); }
-
-  .status-line {
-    font-size: 12px;
-    color: var(--dim);
-    text-align: center;
-    margin-top: 8px;
-  }
-
-  .edit-toggle {
-    margin-top: 12px;
-    font-size: 12px;
-    color: var(--accent);
-    text-align: center;
-    background: transparent;
-    width: 100%;
-    padding: 6px 0;
-  }
-
-  .editor {
-    display: none;
-    margin-top: 10px;
-  }
-  .editor.open { display: block; }
-  textarea {
-    width: 100%;
-    min-height: 130px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-family: inherit;
-    font-size: 14px;
-    resize: vertical;
-    background: var(--field-bg);
-    color: var(--ink);
-  }
-  .hint {
-    font-size: 11px;
-    color: var(--dim);
-    margin-top: 6px;
-  }
-  .save-btn {
-    margin-top: 10px;
-    padding: 11px 0;
-    width: 100%;
-    background: var(--line);
-    color: var(--ink);
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 15px;
+    font-size: 15.5px;
     font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-text);
+    cursor: pointer;
+    transition: transform 80ms ease, background 120ms ease;
   }
+  .copy-btn:active { transform: scale(0.98); background: var(--accent-dark); }
+  .copy-btn:disabled { opacity: 0.5; cursor: default; }
 
   .toast {
     position: fixed;
-    bottom: 24px;
     left: 50%;
-    transform: translateX(-50%);
-    background: var(--accent-strong);
-    color: #0c1512;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--text);
     padding: 10px 18px;
     border-radius: 20px;
     font-size: 13px;
-    font-weight: 600;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
+    transition: opacity 180ms ease, transform 180ms ease;
+    z-index: 10;
   }
-  .toast.show { opacity: 1; }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  footer {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .reset-btn {
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 4px 0;
+  }
 </style>
 </head>
 <body>
+<div class="app">
+  <header>
+    <h1>Copy Hub</h1>
+    <span class="count" id="dayCount">0 copies today</span>
+  </header>
 
-<header>
-  <h1>Copy Hub</h1>
-</header>
+  <div class="vars-panel">
+    <div class="vars-title">Variables</div>
+    <div class="vars-grid">
+      <div class="var-field">
+        <label for="varDomain">Domain</label>
+        <input id="varDomain" type="text" placeholder="yoursite.com">
+      </div>
+      <div class="var-field">
+        <label for="varBrand">Brand name</label>
+        <input id="varBrand" type="text" placeholder="Your Brand">
+      </div>
+      <div class="var-field">
+        <label for="varProduct">Product name</label>
+        <input id="varProduct" type="text" placeholder="Product">
+      </div>
+      <div class="var-field">
+        <label for="varPrice">Price</label>
+        <input id="varPrice" type="text" placeholder="$29">
+      </div>
+      <div class="var-field full">
+        <label for="varUrgency">Offer end date</label>
+        <input id="varUrgency" type="date">
+      </div>
+    </div>
+    <div class="vars-hint">Drop <code>{domain}</code> <code>{brand}</code> <code>{product}</code> <code>{price}</code> <code>{urgency}</code> into the text below. The date picker fills in as "Month Day" (e.g. September 10th) wherever <code>{urgency}</code> appears.</div>
+  </div>
 
-<div class="domain-card">
-  <label for="domain-input">Your domain</label>
-  <input id="domain-input" type="text" placeholder="yoursite.com" autocomplete="off" autocapitalize="off" autocorrect="off">
-  <div class="domain-hint">Use {domain} in your pinned comment variants to auto-insert this.</div>
+  <div class="section">
+    <div class="section-label">On-screen CTA — rotation list (one per line)</div>
+    <textarea class="core-input" id="ctaList" style="min-height:120px" placeholder="Paste your CTA variants, one per line. Each tap cycles to a new one."></textarea>
+    <div class="save-hint" id="ctaSaveHint"></div>
+    <div class="display empty" id="ctaDisplay">Tap copy to pull your first CTA.</div>
+    <button class="copy-btn" id="ctaBtn">Copy CTA</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Caption — rotation list (separate each with a line of ---)</div>
+    <textarea class="core-input" id="captionList" style="min-height:160px" placeholder="Paste your caption variants. Put a line with --- between each one. Each tap cycles to a new one."></textarea>
+    <div class="save-hint" id="captionSaveHint"></div>
+    <div class="display empty" id="captionDisplay">Tap copy to pull your first caption.</div>
+    <button class="copy-btn" id="captionBtn">Copy caption</button>
+  </div>
+
+  <footer>
+    <button class="reset-btn" id="resetBtn">Reset history</button>
+  </footer>
 </div>
 
-<main>
-  <div class="card">
-    <h2>Caption</h2>
-    <div class="current-text" id="videocaption-preview">No variants yet — add some below.</div>
-    <button class="copy-btn" id="videocaption-copy-btn">Copy caption</button>
-    <div class="status-line" id="videocaption-status"></div>
-    <button class="edit-toggle" id="videocaption-edit-toggle">Edit variants</button>
-    <div class="editor" id="videocaption-editor">
-      <textarea id="videocaption-textarea" placeholder="Paste each caption version on its own line..."></textarea>
-      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
-      <button class="save-btn" id="videocaption-save-btn">Save variants</button>
-    </div>
-  </div>
+<div class="toast" id="toast"></div>
 
-  <div class="card">
-    <h2>On-screen CTA</h2>
-    <div class="current-text" id="caption-preview">No variants yet — add some below.</div>
-    <button class="copy-btn" id="caption-copy-btn">Copy on-screen CTA</button>
-    <div class="status-line" id="caption-status"></div>
-    <button class="edit-toggle" id="caption-edit-toggle">Edit variants</button>
-    <div class="editor" id="caption-editor">
-      <textarea id="caption-textarea" placeholder="Paste each version on its own line..."></textarea>
-      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
-      <button class="save-btn" id="caption-save-btn">Save variants</button>
-    </div>
-  </div>
+<script>
+const DEFAULT_CTA_LIST = [
+  "How is in the caption",
+  "Tutorial's in the caption 👉",
+  "How's in caption 👉",
+  "How's in caption",
+  "How is in caption 💕",
+  "How to get it is in caption",
+  "How is sitting in caption",
+  "How is in caption",
+  "Tutorial in caption 👉",
+  "Tutorial in caption 💕",
+  "How is in caption 👉",
+  "How in caption 👉",
+  "Checkout caption for tutorial 👉",
+  "How is in the caption 😭",
+  "How to get coupon steps are in caption 👆",
+  "How is in caption 😭",
+  "How to get coupon code is in caption 👆",
+  "How is in caption 👆"
+].join('\n');
 
-  <div class="card">
-    <h2>Pinned comment</h2>
-    <div class="current-text" id="comment-preview">No variants yet — add some below.</div>
-    <button class="copy-btn" id="comment-copy-btn">Copy comment</button>
-    <div class="status-line" id="comment-status"></div>
-    <button class="edit-toggle" id="comment-edit-toggle">Edit variants</button>
-    <div class="editor" id="comment-editor">
-      <textarea id="comment-textarea" placeholder="Paste each version on its own line. Use {domain} where your domain should go."></textarea>
-      <div class="hint">Cycles through every line before repeating, then reshuffles.</div>
-      <button class="save-btn" id="comment-save-btn">Save variants</button>
-    </div>
-  </div>
-</main>
+const DEFAULT_CAPTION_LIST = [
+`There's a {brand} offer going around that almost nobody is talking about. It says shoppers may be able to get a {product} for just {price} until {urgency}.
 
-<div class="toast" id="toast">Copied</div>
+Follow the quick steps below to check it out:
+👉 Go to {domain} from your phone 📱
+Read the instructions carefully on the website.
+Check the requirements and, if you're eligible, claim your discount coupon.
+Then head to {brand}, find the {product}, and use the coupon at checkout.
+The offer is listed as valid until {urgency}. Check the terms and availability before completing your purchase.`,
 
-<script src="data.js"></script>
-<script src="script.js"></script>
+`There's a {brand} deal circulating that hardly anyone's talking about. Shoppers may be able to snag a {product} for only {price} before {urgency}.
 
+Here's how to check it out:
+👀 Head to {domain} on your phone 📱
+Read the instructions on the site carefully.
+Check if you qualify, then claim your discount coupon.
+Go to {brand}, find the {product}, and apply the coupon at checkout.
+This offer is listed as valid until {urgency} — confirm the terms and availability before you buy.`,
+
+`Not a lot of people know about this {brand} offer right now. It looks like shoppers can get a {product} for just {price}, but only until {urgency}.
+
+Quick steps to check it out:
+📲 Open {domain} on your phone
+Read through the site's instructions carefully.
+See if you're eligible, then grab your discount coupon.
+Head over to {brand}, search for the {product}, and use the coupon at checkout.
+The offer's listed as valid through {urgency}. Double-check the terms and availability before purchasing.`,
+
+`There's an under-the-radar {brand} offer right now — shoppers may be able to get a {product} for just {price} until {urgency}.
+
+Steps to check it out:
+👉 Visit {domain} from your phone 📱
+Carefully read the site's instructions.
+Check your eligibility and claim your discount coupon if you qualify.
+Then go to {brand}, find the {product}, and use the coupon at checkout.
+Offer listed as valid until {urgency} — verify terms and availability before you buy.`,
+
+`Barely anyone's talking about this {brand} offer. It says shoppers might get a {product} for just {price} before {urgency}.
+
+Here's the quick rundown:
+📱 Go to {domain} on your phone
+Read the site's instructions closely.
+Check if you're eligible and claim your coupon.
+Head to {brand}, locate the {product}, and use the coupon at checkout.
+It's listed as valid until {urgency}, so check terms and availability before purchasing.`,
+
+`This {brand} offer is flying under the radar. Shoppers may be able to snag a {product} for {price} — but only until {urgency}.
+
+To check it out:
+👉 Go to {domain} from your phone 📱
+Read the instructions on the website carefully.
+See if you qualify and claim your discount coupon.
+Then head to {brand}, find the {product}, and apply the coupon at checkout.
+Listed as valid through {urgency}. Check terms and availability first.`,
+
+`Hardly anyone's talking about this {brand} deal. It says shoppers could get a {product} for just {price} until {urgency}.
+
+Quick steps:
+📱 Pull up {domain} on your phone
+Read the instructions on the site carefully.
+Check if you're eligible, then claim your coupon.
+Go to {brand}, find the {product}, and use it at checkout.
+Offer valid until {urgency} — confirm terms and availability before buying.`,
+
+`There's a {brand} offer that's staying pretty quiet. Shoppers may be able to grab a {product} for only {price} before {urgency}.
+
+How to check it out:
+👉 Head to {domain} on your phone 📱
+Read the site instructions carefully.
+Check the requirements, then claim your discount coupon if eligible.
+Then go to {brand}, find the {product}, and use the coupon at checkout.
+It's listed as valid until {urgency}. Confirm terms and availability before purchasing.`,
+
+`Not many people know about this {brand} offer yet. Shoppers may be able to get a {product} for just {price} until {urgency}.
+
+Steps to check it out:
+📲 Go to {domain} from your phone
+Read the instructions on the website carefully.
+Check eligibility and claim your discount coupon.
+Head to {brand}, find the {product}, and use the coupon at checkout.
+Valid until {urgency} per the listing — check terms and availability before you buy.`,
+
+`There's a quiet little {brand} offer going around. It says shoppers may get a {product} for just {price} until {urgency}.
+
+Here's how to check it out:
+👉 Go to {domain} on your phone 📱
+Carefully read through the site's instructions.
+Check the requirements and claim your coupon if you qualify.
+Then head to {brand}, find the {product}, and use the coupon at checkout.
+Offer's valid until {urgency} — check the terms and availability before buying.`
+].join('\n---\n');
+
+const state = {
+  vars: { domain: '', brand: '', product: '', price: '', urgency: '' },
+  captionListText: '',
+  captionQueue: [],
+  lastCaption: '',
+  ctaListText: '',
+  ctaQueue: [],
+  lastCta: '',
+  copiesToday: 0
+};
+
+const els = {
+  varDomain: document.getElementById('varDomain'),
+  varBrand: document.getElementById('varBrand'),
+  varProduct: document.getElementById('varProduct'),
+  varPrice: document.getElementById('varPrice'),
+  varUrgency: document.getElementById('varUrgency'),
+  captionList: document.getElementById('captionList'),
+  ctaList: document.getElementById('ctaList'),
+  captionDisplay: document.getElementById('captionDisplay'),
+  ctaDisplay: document.getElementById('ctaDisplay'),
+  captionBtn: document.getElementById('captionBtn'),
+  ctaBtn: document.getElementById('ctaBtn'),
+  captionSaveHint: document.getElementById('captionSaveHint'),
+  ctaSaveHint: document.getElementById('ctaSaveHint'),
+  toast: document.getElementById('toast'),
+  dayCount: document.getElementById('dayCount'),
+  resetBtn: document.getElementById('resetBtn')
+};
+
+function showToast(msg) {
+  els.toast.textContent = msg;
+  els.toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => els.toast.classList.remove('show'), 1800);
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function formatUrgencyDate(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  if (!y || !m || !d) return '';
+  const date = new Date(y, m - 1, d);
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const day = date.getDate();
+  const suffix = (day % 10 === 1 && day !== 11) ? 'st'
+    : (day % 10 === 2 && day !== 12) ? 'nd'
+    : (day % 10 === 3 && day !== 13) ? 'rd'
+    : 'th';
+  return `${month} ${day}${suffix}`;
+}
+
+function applyVariables(text) {
+  const map = {
+    domain: state.vars.domain,
+    brand: state.vars.brand,
+    product: state.vars.product,
+    price: state.vars.price,
+    urgency: formatUrgencyDate(state.vars.urgency)
+  };
+  let out = text;
+  Object.keys(map).forEach(key => {
+    const re = new RegExp(`\\{\\s*${key}\\s*\\}`, 'gi');
+    out = out.replace(re, map[key] || '');
+  });
+  return out.replace(/[ \t]{2,}/g, ' ').replace(/ +\n/g, '\n').trim();
+}
+
+async function loadState() {
+  try {
+    const res = await window.storage.get('copyhub-data');
+    if (res && res.value) {
+      const data = JSON.parse(res.value);
+      state.vars = { ...state.vars, ...(data.vars || {}) };
+      state.captionListText = data.captionListText || '';
+      state.lastCaption = data.lastCaption || '';
+      state.ctaListText = data.ctaListText || '';
+      state.lastCta = data.lastCta || '';
+      const savedDay = data.day || '';
+      state.copiesToday = savedDay === todayKey() ? (data.copiesToday || 0) : 0;
+    }
+  } catch (e) {
+    // no saved data yet
+  }
+  if (!state.captionListText) {
+    state.captionListText = DEFAULT_CAPTION_LIST;
+  }
+  if (!state.ctaListText) {
+    state.ctaListText = DEFAULT_CTA_LIST;
+  }
+  persist();
+  els.varDomain.value = state.vars.domain;
+  els.varBrand.value = state.vars.brand;
+  els.varProduct.value = state.vars.product;
+  els.varPrice.value = state.vars.price;
+  els.varUrgency.value = state.vars.urgency;
+  els.captionList.value = state.captionListText;
+  els.ctaList.value = state.ctaListText;
+  updateDayCount();
+  if (state.lastCaption) {
+    els.captionDisplay.textContent = state.lastCaption;
+    els.captionDisplay.classList.remove('empty');
+  }
+  if (state.lastCta) {
+    els.ctaDisplay.textContent = state.lastCta;
+    els.ctaDisplay.classList.remove('empty');
+  }
+}
+
+async function persist() {
+  try {
+    await window.storage.set('copyhub-data', JSON.stringify({
+      vars: state.vars,
+      captionListText: state.captionListText,
+      lastCaption: state.lastCaption,
+      ctaListText: state.ctaListText,
+      lastCta: state.lastCta,
+      copiesToday: state.copiesToday,
+      day: todayKey()
+    }));
+  } catch (e) {
+    console.error('Storage save failed', e);
+  }
+}
+
+function updateDayCount() {
+  els.dayCount.textContent = `${state.copiesToday} ${state.copiesToday === 1 ? 'copy' : 'copies'} today`;
+}
+
+let saveTimer = null;
+function scheduleSave(hintEl) {
+  if (hintEl) hintEl.textContent = 'Saving…';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await persist();
+    if (hintEl) {
+      hintEl.textContent = 'Saved';
+      setTimeout(() => { if (hintEl.textContent === 'Saved') hintEl.textContent = ''; }, 1500);
+    }
+  }, 500);
+}
+
+els.varDomain.addEventListener('input', () => { state.vars.domain = els.varDomain.value; scheduleSave(); });
+els.varBrand.addEventListener('input', () => { state.vars.brand = els.varBrand.value; scheduleSave(); });
+els.varProduct.addEventListener('input', () => { state.vars.product = els.varProduct.value; scheduleSave(); });
+els.varPrice.addEventListener('input', () => { state.vars.price = els.varPrice.value; scheduleSave(); });
+els.varUrgency.addEventListener('input', () => { state.vars.urgency = els.varUrgency.value; scheduleSave(); });
+
+els.captionList.addEventListener('input', () => { state.captionListText = els.captionList.value; state.captionQueue = []; scheduleSave(els.captionSaveHint); });
+els.ctaList.addEventListener('input', () => { state.ctaListText = els.ctaList.value; state.ctaQueue = []; scheduleSave(els.ctaSaveHint); });
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function parseCaptionVariants(text) {
+  return text.split(/\n\s*-{3,}\s*\n/).map(s => s.trim()).filter(Boolean);
+}
+
+function parseCtaVariants(text) {
+  return text.split('\n').map(s => s.trim()).filter(Boolean);
+}
+
+async function nextFrom(config) {
+  const lines = config.parse(config.getListText());
+  if (!lines.length) {
+    showToast(`Add at least one ${config.label} above first`);
+    config.listEl.focus();
+    return;
+  }
+
+  if (!config.getQueue().length) {
+    let fresh = shuffle(lines);
+    if (fresh.length > 1 && fresh[0] === config.getLast()) {
+      [fresh[0], fresh[1]] = [fresh[1], fresh[0]];
+    }
+    config.setQueue(fresh);
+  }
+
+  const queue = config.getQueue();
+  const next = queue.shift();
+  config.setQueue(queue);
+  const filled = applyVariables(next);
+
+  config.displayEl.classList.remove('empty', 'entering');
+  void config.displayEl.offsetWidth;
+  config.displayEl.textContent = filled;
+  config.displayEl.classList.add('entering');
+
+  config.setLast(filled);
+  state.copiesToday += 1;
+  updateDayCount();
+  await persist();
+
+  const copied = await copyToClipboard(filled);
+  showToast(copied ? 'Copied — ready to paste' : 'Tap the box to copy manually');
+}
+
+function nextCaption() {
+  return nextFrom({
+    label: 'caption',
+    parse: parseCaptionVariants,
+    getListText: () => state.captionListText,
+    getQueue: () => state.captionQueue,
+    setQueue: (q) => { state.captionQueue = q; },
+    getLast: () => state.lastCaption,
+    setLast: (v) => { state.lastCaption = v; },
+    listEl: els.captionList,
+    displayEl: els.captionDisplay
+  });
+}
+
+function nextCta() {
+  return nextFrom({
+    label: 'CTA line',
+    parse: parseCtaVariants,
+    getListText: () => state.ctaListText,
+    getQueue: () => state.ctaQueue,
+    setQueue: (q) => { state.ctaQueue = q; },
+    getLast: () => state.lastCta,
+    setLast: (v) => { state.lastCta = v; },
+    listEl: els.ctaList,
+    displayEl: els.ctaDisplay
+  });
+}
+
+els.captionBtn.addEventListener('click', nextCaption);
+els.ctaBtn.addEventListener('click', nextCta);
+
+els.captionDisplay.addEventListener('click', () => {
+  if (!els.captionDisplay.classList.contains('empty')) copyToClipboard(els.captionDisplay.textContent).then(ok => showToast(ok ? 'Copied' : 'Copy failed'));
+});
+els.ctaDisplay.addEventListener('click', () => {
+  if (!els.ctaDisplay.classList.contains('empty')) copyToClipboard(els.ctaDisplay.textContent).then(ok => showToast(ok ? 'Copied' : 'Copy failed'));
+});
+
+els.resetBtn.addEventListener('click', async () => {
+  state.captionQueue = [];
+  state.lastCaption = '';
+  state.ctaQueue = [];
+  state.lastCta = '';
+  state.copiesToday = 0;
+  els.captionDisplay.textContent = 'Tap copy to pull your first caption.';
+  els.captionDisplay.classList.add('empty');
+  els.ctaDisplay.textContent = 'Tap copy to pull your first CTA.';
+  els.ctaDisplay.classList.add('empty');
+  updateDayCount();
+  await persist();
+  showToast('History cleared');
+});
+
+loadState();
+</script>
 </body>
 </html>
