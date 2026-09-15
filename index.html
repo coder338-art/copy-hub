@@ -269,7 +269,7 @@
   </div>
 
   <div class="section">
-    <div class="section-label">On-screen CTA — rotation list (one per line)</div>
+    <div class="section-label">On-screen CTA, rotation list (one per line)</div>
     <textarea class="core-input" id="ctaList" style="min-height:120px" placeholder="Paste your CTA variants, one per line. Each tap cycles to a new one."></textarea>
     <div class="save-hint" id="ctaSaveHint"></div>
     <div class="display empty" id="ctaDisplay">Tap copy to pull your first CTA.</div>
@@ -277,7 +277,7 @@
   </div>
 
   <div class="section">
-    <div class="section-label">Caption — rotation list (separate each with a line of ---)</div>
+    <div class="section-label">Caption, rotation list (separate each with a line of ---)</div>
     <textarea class="core-input" id="captionList" style="min-height:160px" placeholder="Paste your caption variants. Put a line with --- between each one. Each tap cycles to a new one."></textarea>
     <div class="save-hint" id="captionSaveHint"></div>
     <div class="display empty" id="captionDisplay">Tap copy to pull your first caption.</div>
@@ -631,7 +631,7 @@ async function nextFrom(config) {
   await persist();
 
   const copied = await copyToClipboard(filled);
-  showToast(copied ? 'Copied — ready to paste' : 'Tap the box to copy manually');
+  showToast(copied ? 'Copied, ready to paste' : 'Tap the box to copy manually');
 }
 
 function nextCaption() {
