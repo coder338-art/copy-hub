@@ -330,7 +330,7 @@ Here's how to check it out:
 Read the instructions on the site carefully.
 Check if you qualify, then claim your discount coupon.
 Go to {brand}, find the {product}, and apply the coupon at checkout.
-This offer is listed as valid until {urgency} — confirm the terms and availability before you buy.`,
+This offer is listed as valid until {urgency}. Confirm the terms and availability before you buy.`,
 
 `Not a lot of people know about this {brand} offer right now. It looks like shoppers can get a {product} for just {price}, but only until {urgency}.
 
@@ -341,14 +341,14 @@ See if you're eligible, then grab your discount coupon.
 Head over to {brand}, search for the {product}, and use the coupon at checkout.
 The offer's listed as valid through {urgency}. Double-check the terms and availability before purchasing.`,
 
-`There's an under-the-radar {brand} offer right now — shoppers may be able to get a {product} for just {price} until {urgency}.
+`There's an under-the-radar {brand} offer right now. Shoppers may be able to get a {product} for just {price} until {urgency}.
 
 Steps to check it out:
 👉 Visit {domain} from your phone 📱
 Carefully read the site's instructions.
 Check your eligibility and claim your discount coupon if you qualify.
 Then go to {brand}, find the {product}, and use the coupon at checkout.
-Offer listed as valid until {urgency} — verify terms and availability before you buy.`,
+Offer listed as valid until {urgency}. Verify terms and availability before you buy.`,
 
 `Barely anyone's talking about this {brand} offer. It says shoppers might get a {product} for just {price} before {urgency}.
 
@@ -359,7 +359,7 @@ Check if you're eligible and claim your coupon.
 Head to {brand}, locate the {product}, and use the coupon at checkout.
 It's listed as valid until {urgency}, so check terms and availability before purchasing.`,
 
-`This {brand} offer is flying under the radar. Shoppers may be able to snag a {product} for {price} — but only until {urgency}.
+`This {brand} offer is flying under the radar. Shoppers may be able to snag a {product} for {price}, but only until {urgency}.
 
 To check it out:
 👉 Go to {domain} from your phone 📱
@@ -375,7 +375,7 @@ Quick steps:
 Read the instructions on the site carefully.
 Check if you're eligible, then claim your coupon.
 Go to {brand}, find the {product}, and use it at checkout.
-Offer valid until {urgency} — confirm terms and availability before buying.`,
+Offer valid until {urgency}. Confirm terms and availability before buying.`,
 
 `There's a {brand} offer that's staying pretty quiet. Shoppers may be able to grab a {product} for only {price} before {urgency}.
 
@@ -393,7 +393,7 @@ Steps to check it out:
 Read the instructions on the website carefully.
 Check eligibility and claim your discount coupon.
 Head to {brand}, find the {product}, and use the coupon at checkout.
-Valid until {urgency} per the listing — check terms and availability before you buy.`,
+Valid until {urgency} per the listing. Check terms and availability before you buy.`,
 
 `There's a quiet little {brand} offer going around. It says shoppers may get a {product} for just {price} until {urgency}.
 
@@ -402,7 +402,7 @@ Here's how to check it out:
 Carefully read through the site's instructions.
 Check the requirements and claim your coupon if you qualify.
 Then head to {brand}, find the {product}, and use the coupon at checkout.
-Offer's valid until {urgency} — check the terms and availability before buying.`
+Offer's valid until {urgency}. Check the terms and availability before buying.`
 ].join('\n---\n');
 
 const state = {
@@ -463,7 +463,7 @@ function formatUrgencyDate(dateStr) {
 
 function applyVariables(text) {
   const map = {
-    domain: state.vars.domain,
+    domain: state.vars.domain.toUpperCase(),
     brand: state.vars.brand,
     product: state.vars.product,
     price: state.vars.price,
